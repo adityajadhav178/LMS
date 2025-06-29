@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    mame: {
+    name: {
         type: String,
         required: true  
     },
