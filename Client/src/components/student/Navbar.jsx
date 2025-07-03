@@ -3,6 +3,8 @@ import { assets } from '../../assets/assets'
 import { Link } from 'react-router-dom';
 import { useClerk, UserButton , useUser } from '@clerk/clerk-react';
 import { AppContext } from '../../context/AppContext';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 function Navbar() {
 
@@ -10,7 +12,27 @@ function Navbar() {
   
   const {openSignIn} = useClerk();
   const {user} = useUser();
-  const {navigate, isEducator} = useContext(AppContext);
+  const {navigate, isEducator, backendUrl, setIsEducator, getToken} = useContext(AppContext);
+
+  const becomeEducator = async() => {
+    try {
+      if(isEducator) {
+        navigate("/educator");
+        return;
+      }
+      const token = await getToken();
+      await axios.get(backendUrl + '/api/user/update-role', { headers: { Authorization: `Bearer ${token}` } });
+
+      if(data.success) {
+        setIsEducator(true);
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
 
   return (
     <div className={`flex items-center justify-between px-4 sm:px-10 md:px-14 lg:px-36 border-b border-gray-500 py-4 ${isCourseListPage ? "bg-white" : "bg-cyan-100/70"}`}>
@@ -21,7 +43,7 @@ function Navbar() {
                 {
                   user && 
                   <>
-                    <button onClick={() => navigate("/educator")}>{ isEducator ? "Educator Dashboard" : "Become Educator"}</button>
+                    <button onClick={becomeEducator}>{ isEducator ? "Educator Dashboard" : "Become Educator"}</button>
                     <Link to={"/my-enrollments"}>My Enrollments</Link>
                   </>
                 }
@@ -37,7 +59,7 @@ function Navbar() {
             {
               user && 
               <>
-                <button onClick={() => navigate("/educator")}>{ isEducator ? "Educator Dashboard" : "Become Educator"}</button>
+                <button onClick={becomeEducator}>{ isEducator ? "Educator Dashboard" : "Become Educator"}</button>
                 <Link to={"/my-enrollments"}>My Enrollments</Link>
               </>
             }

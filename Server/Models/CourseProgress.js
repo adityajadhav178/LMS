@@ -10,8 +10,7 @@ const courseProgressSchema = new mongoose.Schema({
         required: true
     },
     completed: {
-        type: Boolean,
-        required: true
+        type: Boolean
     },
     lectureCompleted: []
 }, {minimized: false});
